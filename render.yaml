@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ucsi-web
+    env: python
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /status
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    startCommand: "gunicorn -w 2 -b 0.0.0.0:$PORT src.wsgi:application"
+    envVars:
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: WEB_APP_URL
+        sync: false
+      - key: TELEGRAM_TOKEN
+        sync: false
