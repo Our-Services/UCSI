@@ -1,0 +1,13 @@
+app = "ucsi-bot"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  HEADLESS = "1"
+
+[processes]
+  bot = "python -u src/telegram_bot.py"
+
+# لا توجد خدمة HTTP للبوت في وضع Polling
