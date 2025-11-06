@@ -7,16 +7,6 @@ from flask import Flask, render_template, redirect, url_for, request, flash, ses
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-# Import bot helpers lazily to avoid circular issues if needed
-try:
-    from bot import run_bot, load_config
-except Exception:
-    # Fallback when running from different working dirs
-    import sys
-    from pathlib import Path as P
-    sys.path.append(str(P(__file__).resolve().parent))
-    from bot import run_bot, load_config
-
 
 app = Flask(__name__, template_folder=str(Path(__file__).resolve().parent / "templates"), static_folder=str(Path(__file__).resolve().parent / "static"))
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "ucsi-web-secret")
@@ -52,7 +42,12 @@ def set_status(state: str, error: str | None = None):
 
 def read_cfg() -> Dict[str, Any]:
     try:
-        return load_config("config/config.json")
+        import json
+        cfg_path = Path("config/config.json")
+        if not cfg_path.exists():
+            return {}
+        with cfg_path.open("r", encoding="utf-8") as f:
+            return json.load(f)
     except Exception:
         return {}
 
@@ -158,7 +153,15 @@ def auto_run():
     def worker():
         try:
             set_status("running")
-            run_bot(cfg)
+            # Lazy import bot only when automation is triggered
+            try:
+                from bot import run_bot as _run_bot
+            except Exception:
+                import sys
+                from pathlib import Path as P
+                sys.path.append(str(P(__file__).resolve().parent))
+                from bot import run_bot as _run_bot
+            _run_bot(cfg)
             set_status("done")
         except Exception as e:  # noqa
             set_status("error", str(e))
