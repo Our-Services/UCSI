@@ -2,7 +2,7 @@ app = "ucsi-web"
 primary_region = "sin"
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = "UCSI/Dockerfile"
 
 [env]
   PORT = "8080"
@@ -13,7 +13,5 @@ primary_region = "sin"
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
   min_machines_running = 1
   processes = ["app"]
