@@ -1,10 +1,15 @@
 # Minimal image to run the Telegram bot 24/7
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
+
+# System build tools required for packages that need compilation (e.g., greenlet)
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install deps first for better caching
 COPY requirements.txt /app/requirements.txt
