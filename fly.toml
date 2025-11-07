@@ -1,0 +1,31 @@
+app = "ucsi"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  HOST = "0.0.0.0"
+  HEADLESS = "1"
+
+[processes]
+  web = "gunicorn -b 0.0.0.0:8080 src.wsgi:application"
+  bot = "python -u src/telegram_bot.py"
+
+[[services]]
+  processes = ["web"]
+  internal_port = 8080
+  protocol = "tcp"
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+  [[services.ports]]
+    handlers = ["tls","http"]
+    port = 443
+
+  [[services.http_checks]]
+    interval = "15s"
+    timeout = "2s"
+    path = "/status"
+    protocol = "http"
